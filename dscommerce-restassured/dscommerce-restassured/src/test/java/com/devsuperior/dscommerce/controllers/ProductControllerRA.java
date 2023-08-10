@@ -31,7 +31,7 @@ public class ProductControllerRA {
 	private Map<String, Object> putProductInstance;
 
 	@BeforeEach
-	public void setup() {
+	public void setup() throws JSONException {
 		baseURI = "http://localhost:8080";
 
 		clientUsername = "maria@gmail.com";
