@@ -2,12 +2,14 @@ package com.devsuperior.dscommerce.tests;
 
 import static io.restassured.RestAssured.given;
 
+import org.json.JSONException;
+
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
 public class TokenUtil {
 
-	public static String obtainAccessToken(String username, String password) {
+	public static String obtainAccessToken(String username, String password) throws JSONException{
 		Response response = authRequest(username, password);
 		JsonPath jsonBody = response.jsonPath();
 		return jsonBody.getString("access_token");
