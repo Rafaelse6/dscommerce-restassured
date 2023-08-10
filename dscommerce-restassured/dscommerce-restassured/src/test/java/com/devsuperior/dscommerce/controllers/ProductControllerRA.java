@@ -248,4 +248,171 @@ public class ProductControllerRA {
 			.statusCode(401);
 	}
 	
+	@Test
+	public void updateShouldReturnProductWhenIdExistsAndAdminLogged() throws JSONException {
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.body(product)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(200)
+			.body("name", equalTo("Produto atualizado"))
+			.body("price", is(200.0f))
+			.body("imgUrl", equalTo("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"))
+			.body("categories.id", hasItems(2, 3))
+			.body("categories.name", hasItems("Eletrônicos", "Computadores"));
+	}
+	
+	@Test
+	public void updateShouldReturnNotFoundWhenIdDoesNotExistAndAdminLogged() throws JSONException {
+		JSONObject product = new JSONObject(putProductInstance);
+		nonExistingProductId = 100L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.body(product)
+		.when()
+			.put("/products/{id}", nonExistingProductId)
+		.then()
+			.statusCode(404)
+			.body("error", equalTo("Recurso não encontrado"))
+			.body("status", equalTo(404));
+	}
+	
+	@Test
+	public void updateShouldReturnUnprocessableEntityWhenIdExistsAndAdminLoggedAndInvalidName() throws JSONException {
+		putProductInstance.put("name", "ab");
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.body(product)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(422);
+	}
+	
+	@Test
+	public void updateShouldReturnUnprocessableEntityWhenAdminLoggedAndInvalidDescription() throws JSONException {
+		putProductInstance.put("description", "ab");
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.body(product)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(422);
+	}
+	
+	@Test
+	public void updateShouldReturnUnprocessableEntityWhenIdExistsAndAdminLoggedAndPriceIsNegative() throws JSONException {
+		putProductInstance.put("price", -2.0);
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.body(product)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(422);
+	}
+	
+	@Test
+	public void updateShouldReturnUnprocessableEntityWhenIdExistsAndAdminLoggedAndPriceIsZero() throws JSONException {
+		putProductInstance.put("price", 0.0);
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.body(product)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(422);
+	}
+	
+	@Test
+	public void updateShouldReturnUnprocessableEntityWhenIdExistsAndAdminLoggedAndProductHasNoCategory() throws JSONException {
+		putProductInstance.put("categories", null);
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + adminToken)
+			.body(product)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.log()
+			.all()
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(422);
+	}
+	
+	@Test
+	public void updateShouldReturnForbiddenWhenIdExistsAndClientLogged() throws JSONException {
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + clientToken)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.body(product)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(403);
+	}
+	
+	@Test
+	public void updateShouldReturnUnauthorizedWhenIdExistsAndInvalidToken() throws JSONException {
+		JSONObject product = new JSONObject(putProductInstance);
+		existingProductId = 10L;
+		
+		given()
+			.header("Content-type", "application/json")
+			.header("Authorization", "Bearer " + invalidToken)
+			.contentType(ContentType.JSON)
+			.accept(ContentType.JSON)
+			.body(product)
+		.when()
+			.put("/products/{id}", existingProductId)
+		.then()
+			.statusCode(401);
+	}
+	
 }
